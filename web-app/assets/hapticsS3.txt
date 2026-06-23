@@ -1,0 +1,189 @@
+/*
+  HERD — Listener-side receiver
+  Hardware: ESP32-S3-WROOM-1 + MAX98357A I2S amp + harvested DualSense voice-coil (VCA, ~5.5 ohm)
+  Pins: BCLK=GPIO4, LRC=GPIO5, DIN=GPIO6
+  Function: Receive 16 kHz audio packets via ESP-NOW, bandpass 80-300 Hz,
+            apply gain, drive the VCA via I2S
+*/
+
+#include <Arduino.h>
+#include <WiFi.h>
+#include <esp_now.h>
+#include <esp_wifi.h>
+#include <driver/i2s.h>
+#include <math.h>
+
+// --- ESP-NOW config ---
+#define ESPNOW_CHANNEL 6
+
+// --- Audio config ---
+#define SAMPLE_RATE   16000
+#define BUFFER_SAMPLES 64
+#define I2S_PORT       I2S_NUM_0
+
+// --- MAX98357A pins (confirmed working) ---
+#define I2S_BCLK 4
+#define I2S_LRC  5
+#define I2S_DIN  6
+
+// --- Output level -----------------------------------------------------
+//  Total output = INPUT_GAIN * gain * (filtered signal).
+//  INPUT_GAIN is a fixed pre-amp in the float domain that gives real
+//  headroom ABOVE what 'gain' alone (capped at 1.0) could reach. The
+//  filtered 80-300 Hz speech is small, so this is where the strength
+//  comes from. 'gain' (serial 'g 0-100') is your fine trim on top.
+//
+//  Start: INPUT_GAIN 6.0, gain ~0.3 (g 30), then raise.
+//  CAUTION: this is a ~1 W actuator. If it buzzes harshly (clipping) or
+//  gets warm, back off. If 6x isn't enough even at g 100, raise INPUT_GAIN
+//  and re-flash.
+#define INPUT_GAIN 6.0f
+
+// --- Gain (0.0 to 1.0): fine trim on top of INPUT_GAIN ---
+volatile float gain = 0.30f;
+
+struct __attribute__((packed)) AudioPacket {
+  int16_t samples[BUFFER_SAMPLES];
+};
+
+// --- Biquad bandpass filter (80-300 Hz) ---
+// Two cascaded biquads:
+//   Stage 1: 2nd-order Butterworth highpass @ 80 Hz
+//   Stage 2: 2nd-order Butterworth lowpass  @ 300 Hz
+// Coefficients pre-computed for fs = 16000 Hz
+struct Biquad {
+  float b0, b1, b2, a1, a2;
+  float z1, z2;
+  inline float process(float x) {
+    float y = b0 * x + z1;
+    z1 = b1 * x - a1 * y + z2;
+    z2 = b2 * x - a2 * y;
+    return y;
+  }
+};
+
+// 2nd-order Butterworth HPF, fc=80 Hz, fs=16000 Hz
+Biquad hpf = {
+  0.97803048f, -1.95606096f, 0.97803048f,
+  -1.95557824f, 0.95654368f,
+  0.0f, 0.0f
+};
+
+// 2nd-order Butterworth LPF, fc=300 Hz, fs=16000 Hz
+Biquad lpf = {
+  0.00336526f, 0.00673051f, 0.00336526f,
+  -1.83307253f, 0.84653354f,
+  0.0f, 0.0f
+};
+
+// --- I2S output to MAX98357A ---
+void i2sAmpInit() {
+  i2s_config_t cfg = {
+    .mode = (i2s_mode_t)(I2S_MODE_MASTER | I2S_MODE_TX),
+    .sample_rate = SAMPLE_RATE,
+    .bits_per_sample = I2S_BITS_PER_SAMPLE_16BIT,
+    .channel_format = I2S_CHANNEL_FMT_ONLY_LEFT,
+    .communication_format = I2S_COMM_FORMAT_STAND_I2S,
+    .intr_alloc_flags = ESP_INTR_FLAG_LEVEL1,
+    .dma_buf_count = 8,
+    .dma_buf_len = BUFFER_SAMPLES,
+    .use_apll = false,
+    .tx_desc_auto_clear = true,
+    .fixed_mclk = 0
+  };
+  i2s_pin_config_t pins = {
+    .bck_io_num = I2S_BCLK,
+    .ws_io_num  = I2S_LRC,
+    .data_out_num = I2S_DIN,
+    .data_in_num  = I2S_PIN_NO_CHANGE
+  };
+  i2s_driver_install(I2S_PORT, &cfg, 0, NULL);
+  i2s_set_pin(I2S_PORT, &pins);
+  i2s_zero_dma_buffer(I2S_PORT);
+}
+
+// --- Packet stats ---
+volatile uint32_t packetsRx = 0;
+volatile uint32_t lastReportMs = 0;
+
+// --- ESP-NOW receive callback ---
+// Use the older signature for broader compatibility across core versions.
+// If your core needs the newer signature with esp_now_recv_info_t,
+// see the alternative block at the bottom of this file.
+void onRecv(const uint8_t *mac, const uint8_t *data, int len) {
+  if (len != sizeof(AudioPacket)) return;
+
+  AudioPacket pkt;
+  memcpy(&pkt, data, sizeof(pkt));
+
+  int16_t outBuf[BUFFER_SAMPLES];
+  for (int i = 0; i < BUFFER_SAMPLES; i++) {
+    // Convert to float for filter math
+    float x = (float)pkt.samples[i];
+    // Bandpass: HPF then LPF
+    float y = hpf.process(x);
+    y = lpf.process(y);
+    // Apply fixed pre-amp (headroom) then fine trim
+    y *= (INPUT_GAIN * gain);
+    // Clip and cast
+    if (y >  32767.0f) y =  32767.0f;
+    if (y < -32768.0f) y = -32768.0f;
+    outBuf[i] = (int16_t)y;
+  }
+
+  size_t written;
+  i2s_write(I2S_PORT, outBuf, sizeof(outBuf), &written, portMAX_DELAY);
+  packetsRx++;
+}
+
+void setup() {
+  Serial.begin(115200);
+  delay(1500);
+  Serial.println("HERD Receiver (S3 + VCA) boot");
+
+  // I2S amp init
+  i2sAmpInit();
+  Serial.println("I2S amp ready");
+
+  // WiFi + ESP-NOW
+  WiFi.mode(WIFI_STA);
+  WiFi.disconnect();
+  esp_wifi_set_channel(ESPNOW_CHANNEL, WIFI_SECOND_CHAN_NONE);
+
+  if (esp_now_init() != ESP_OK) {
+    Serial.println("ESP-NOW init failed, restarting");
+    delay(2000);
+    ESP.restart();
+  }
+  esp_now_register_recv_cb(onRecv);
+
+  Serial.printf("MAC: %s\n", WiFi.macAddress().c_str());
+  Serial.printf("Listening on channel %d, %d Hz, INPUT_GAIN %.1f, gain %.2f\n",
+                ESPNOW_CHANNEL, SAMPLE_RATE, INPUT_GAIN, gain);
+  Serial.println("Commands:  g <0-100>  set fine-trim gain   (e.g. 'g 30')");
+}
+
+void loop() {
+  // Stats every 2 sec
+  uint32_t now = millis();
+  if (now - lastReportMs >= 2000) {
+    uint32_t rate = packetsRx / 2;
+    Serial.printf("Packets/sec: %lu (expected ~%d), gain=%.2f\n",
+                  rate, SAMPLE_RATE / BUFFER_SAMPLES, gain);
+    packetsRx = 0;
+    lastReportMs = now;
+  }
+
+  // Runtime gain control
+  if (Serial.available()) {
+    String cmd = Serial.readStringUntil('\n');
+    cmd.trim();
+    if (cmd.startsWith("g ")) {
+      float g = cmd.substring(2).toFloat() / 100.0f;
+      if (g < 0.0f) g = 0.0f;
+      if (g > 1.0f) g = 1.0f;
+      gain = g;
+      Serial.printf("Gain set to %.2f (effective %.2f x)\n", gain, INPUT_GAIN * gain);
+    }
+  }
+}

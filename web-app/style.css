@@ -1,0 +1,181 @@
+/* =========================================
+   BAUHAUS SANTORINI - STUDIO DRAFTING EDITION
+   ========================================= */
+
+/* --- 1. DESIGN TOKENS --- */
+:root {
+    --drafting-paper: #a1a1a1;  /* Warm, off-white paper */
+    --grid-line: #D6D4CB;       /* Soft, technical grey for grid */
+    --concrete-base: #E8E8E8;   /* Light concrete */
+    
+    /* Premium Brass Workers */
+    --p1-copper: #B87333;
+    --p2-brass: #C5A059;
+}
+
+/* --- 2. BASE LAYOUT --- */
+body {
+    background-color: var(--drafting-paper);
+    font-family: 'Courier New', Courier, monospace; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    overflow: hidden; /* Prevents scrollbars */
+    color: #333;
+}
+
+/* --- THE GRAIN OVERLAY --- */
+.grain-overlay {
+    position: fixed; 
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    pointer-events: none; /* Lets clicks pass through to the board */
+    z-index: 9999; 
+    filter: url(#noiseFilter);
+    
+    /* Increased opacity and overlay blend mode so it bites into the concrete */
+    opacity: 0.12; 
+    mix-blend-mode: overlay; 
+}
+
+/* --- 3. HORIZONTAL APP LAYOUT --- */
+.game-container {
+    position: relative; /* Allows absolute positioning for the sidebar */
+    display: flex;
+    justify-content: center; /* Perfectly centers the board */
+    align-items: center;
+    width: 100vw;
+    height: 100vh;
+    padding: 0;
+    z-index: 10; /* Keeps it above the grain background */
+}
+
+.game-info {
+    position: absolute; 
+    left: 60px; /* Anchors clearly to the left side */
+    
+    /* MATHEMATICAL ALIGNMENT: 
+       Board is 558px tall (110x5 + 2x4). Half is 279px. 
+       This perfectly aligns text with the top edge of the board! */
+    top: calc(50% - 279px); 
+    
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+    z-index: 20;
+}
+
+/* --- 4. TYPOGRAPHY --- */
+h1 { 
+    margin: 0; 
+    font-size: 2.8rem; 
+    letter-spacing: 6px; 
+    text-transform: uppercase;
+    
+    /* Forces invisible text box to hug the letters for pixel-perfect alignment */
+    line-height: 1; 
+}
+
+.status-text { 
+    margin: 0; 
+    font-size: 1rem; 
+    font-weight: bold; 
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* --- 5. THE BOARD --- */
+.board {
+    display: grid;
+    grid-template-columns: repeat(5, 110px); 
+    grid-template-rows: repeat(5, 110px);
+    gap: 2px; /* Thin drafting lines */
+    background-color: var(--grid-line); /* Color of the grid lines */
+    border: none;
+    box-shadow: none; 
+}
+
+/* --- 6. THE CELLS (Base Container) --- */
+.cell {
+    width: 110px; 
+    height: 110px;
+    position: relative;
+    cursor: pointer;
+    background-color: transparent; /* Lets the board grid lines work */
+    box-shadow: 4px 4px 0px rgba(0,0,0,0.5); /* Base shadow */
+    transition: transform 0.1s, box-shadow 0.1s; 
+}
+
+.cell:active {
+    transform: translate(3px, 3px); 
+    box-shadow: 1px 1px 0px rgba(0,0,0,0.5); 
+}
+
+/* --- 7. THE BUILDINGS (Rotating Layer) --- */
+/* The graphic sits on a separate layer inside the cell so we can rotate it! */
+.cell::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    
+    /* Uses the random rotation injected by Javascript, defaults to 0 */
+    transform: rotate(var(--building-rotation, 0deg));
+    z-index: 1;
+}
+
+/* Connect JS data heights to Figma SVGs */
+.cell[data-height="0"]::before { background-image: url('./assets/tile-empty.svg'); }
+.cell[data-height="1"]::before { background-image: url('./assets/tile-level1.svg'); }
+.cell[data-height="2"]::before { background-image: url('./assets/tile-level2.svg'); }
+.cell[data-height="3"]::before { background-image: url('./assets/tile-level3.svg'); }
+.cell[data-height="4"]::before { background-image: url('./assets/tile-dome.svg'); }
+
+/* --- 8. THE WORKERS (Premium Brass Rings) --- */
+.cell[data-worker]::after {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    
+    /* NEW: We subtract a dynamic shift variable from the 50% center point */
+    transform: translate(
+        calc(-50% - var(--worker-shift, 0px)), 
+        calc(-50% - var(--worker-shift, 0px))
+    );
+    
+    width: 32px; 
+    height: 32px;
+    border-radius: 50%;
+    z-index: 10; 
+    
+    box-shadow: inset 2px 2px 4px rgba(0,0,0,0.6), 4px 4px 5px rgba(0,0,0,0.3);
+    
+    /* Adds a smooth animation when the worker climbs up or jumps down a level */
+    transition: transform 0.2s ease-out;
+}
+
+/* --- 9. WORKER ELEVATION PHYSICS --- */
+/* The taller the building, the further top-left the roof visually shifts. 
+   TUNE THESE NUMBERS: They should inversely match the drop shadows you drew in Figma! 
+   If your Level 1 shadow goes +4px down-right, your worker must shift -4px up-left. */
+
+.cell[data-height="0"] { --worker-shift: 0px;  } /* Ground Level: Dead center */
+.cell[data-height="1"] { --worker-shift: 4px;  } /* Level 1: Slight shift */
+.cell[data-height="2"] { --worker-shift: 8px;  } /* Level 2: Medium shift */
+.cell[data-height="3"] { --worker-shift: 12px; } /* Level 3: Maximum shift */
+
+.cell[data-worker^="P1"]::after { 
+    border: 8px solid var(--p1-copper); 
+    border-color: #D4A373 #A0522D #8B4513 #CD853F;
+}
+
+.cell[data-worker^="P2"]::after { 
+    border: 8px solid var(--p2-brass);
+    border-color: #E6C27A #B08D46 #8B6B32 #D4AF37;
+}
