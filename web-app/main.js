@@ -10,7 +10,7 @@ import {
     moveWorker, 
     buildBlock, 
     placeWorker
-} from './game.js';
+} from './santorini.js';
 
 
 let gameState = createGame();

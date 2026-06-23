@@ -1,4 +1,4 @@
-import { createGame, getValidMoves } from '../game.js';
+import { createGame, getValidMoves } from '../santorini.js';
 
 /**
  * Visual Debugger
