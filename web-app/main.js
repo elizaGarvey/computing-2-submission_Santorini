@@ -17,16 +17,29 @@ const BOARD_SIZE = 5;
 // ============================================================
 // 1. THE SINGLE SOURCE OF TRUTH
 // ============================================================
+const getValidPlacements = (board) => {
+    const valid = [];
+    for (let r = 0; r < BOARD_SIZE; r++) {
+        for (let c = 0; c < BOARD_SIZE; c++) {
+            if (!board[r][c].worker) valid.push({ r, c });
+        }
+    }
+    return valid;
+};
+
+const initialGame = createGame();
 let appState = {
-    game: createGame(),
+    game: initialGame,
     ui: {
-        highlightedCells: [],
+        highlightedCells: initialGame.turnPhase === "PLACE" ? getValidPlacements(initialGame.board) : [],
         cursor: { r: 2, c: 2 },
-        lastWorkerByPlayer: { P1: null, P2: null }
+        lastWorkerByPlayer: { P1: null, P2: null },
+        showStartScreen: true,
+        gameWon: null
     }
 };
 
-const PLAYER_CURSOR_COLOR = { P1: "#2e2e93', P2: '#e0b700" };
+const PLAYER_CURSOR_COLOR = { P1: "#2e2e93", P2: "#e0b700" };
 const boardElement = document.getElementById("game-board");
 const statusElement = document.getElementById("game-status");
 
@@ -41,7 +54,7 @@ const findWorkerPosition = (board, workerId) => {
 };
 
 const getSiblingWorkerId = (workerId) => {
-    const [player, letter] = workerId.split("");
+    const [player, letter] = workerId.split("_");
     return `${player}_${letter === "A" ? "B" : "A"}`;
 };
 
@@ -55,6 +68,30 @@ const isClickValid = (highlightedCells, r, c) => {
 // ============================================================
 const reduceState = (state, action) => {
     switch (action.type) {
+        case "DISMISS_START":
+            return {
+                ...state,
+                ui: {
+                    ...state.ui,
+                    showStartScreen: false
+                }
+            };
+
+        case "RESTART_GAME":
+            const newGame = createGame();
+            return {
+                ...state,
+                game: newGame,
+                ui: {
+                    ...state.ui,
+                    showStartScreen: false,
+                    gameWon: null,
+                    highlightedCells: getValidPlacements(newGame.board),
+                    cursor: { r: 2, c: 2 },
+                    lastWorkerByPlayer: { P1: null, P2: null }
+                }
+            };
+
         case "MOVE_CURSOR":
             return {
                 ...state,
@@ -70,6 +107,8 @@ const reduceState = (state, action) => {
             };
 
         case "INTERACT_CELL":
+            if (state.ui.showStartScreen) return state;
+
             // 1. Clone the current branches
             let nextGame = { ...state.game };
             let nextUI = { ...state.ui };
@@ -83,7 +122,14 @@ const reduceState = (state, action) => {
 
             // 2. Process logic based on phase
             if (nextGame.turnPhase === "PLACE") {
-                nextGame = placeWorker(nextGame, r, c);
+                if (isClickValid(state.ui.highlightedCells, r, c)) {
+                    nextGame = placeWorker(nextGame, r, c);
+                    if (nextGame.turnPhase === "PLACE") {
+                        nextUI.highlightedCells = getValidPlacements(nextGame.board);
+                    } else {
+                        nextUI.highlightedCells = [];
+                    }
+                }
             }
             else if (nextGame.turnPhase === "SELECT") {
                 const cell = nextGame.board[r][c];
@@ -152,8 +198,7 @@ const reduceState = (state, action) => {
 
             if (nextGame.turnPhase === "GAMEOVER" && state.game.turnPhase !==
                 "GAMEOVER") {
-                setTimeout(() => alert
-                ("GAME OVER! ${nextGame.winner} HAS WON THE GAME!"), 10);
+                nextUI.gameWon = nextGame.winner;
             }
 
             // 3. Return the fully formed new state
@@ -178,6 +223,21 @@ const dispatch = (action) => {
 // 4. THE PURE RENDERE
 // ============================================================
 const render = (state) => {
+    const modalOverlay = document.getElementById("modal-overlay");
+    const modalImage = document.getElementById("modal-image");
+
+    if (modalOverlay && modalImage) {
+        if (state.ui.showStartScreen) {
+            modalOverlay.style.display = "flex";
+            modalImage.src = "assets/Start.png";
+        } else if (state.game.turnPhase === "GAMEOVER") {
+            modalOverlay.style.display = "flex";
+            modalImage.src = state.game.winner === "P1" ? "assets/end_1.png" : "assets/end_2.png";
+        } else {
+            modalOverlay.style.display = "none";
+        }
+    }
+
     boardElement.innerHTML = "";
     boardElement.style.setProperty("--cursor-color", PLAYER_CURSOR_COLOR
         [state.game.currentPlayer]);
@@ -231,7 +291,7 @@ const render = (state) => {
                 cellDiv.style.backgroundColor = "rgba(255, 255, 255, 0.15)";
             }
 
-            cellDiv.setAttribute("role', 'gridcell");
+            cellDiv.setAttribute("role", "gridcell");
             cellDiv.setAttribute("aria-selected",
                 isSelectedWorker ? "true" : "false");
             cellDiv.setAttribute("aria-label", buildCellLabel
@@ -281,8 +341,7 @@ boardElement.addEventListener("keydown", (e) => {
         ({ type: "MOVE_CURSOR", dR: 0, dC: -1 }); break;
         case "ArrowRight": dispatch
         ({ type: "MOVE_CURSOR", dR: 0, dC: 1 }); break;
-        case "":
-        case "Enter":
+        case " ":
             e.preventDefault();
             dispatch({ type: "INTERACT_CELL",
                 r: appState.ui.cursor.r, c: appState.ui.cursor.c });
@@ -298,6 +357,30 @@ const init = () => {
         console.error("CRASH: Cannot find an element with id='game-board'");
         return;
     }
+
+    const modalImage = document.getElementById("modal-image");
+    if (modalImage) {
+        modalImage.addEventListener("click", () => {
+            if (appState.ui.showStartScreen) {
+                dispatch({ type: "DISMISS_START" });
+            } else if (appState.game.turnPhase === "GAMEOVER") {
+                dispatch({ type: "RESTART_GAME" });
+            }
+        });
+    }
+
+    document.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+            if (appState.ui.showStartScreen) {
+                e.preventDefault();
+                dispatch({ type: "DISMISS_START" });
+            } else if (appState.game.turnPhase === "GAMEOVER") {
+                e.preventDefault();
+                dispatch({ type: "RESTART_GAME" });
+            }
+        }
+    });
+
     render(appState);
 };
 

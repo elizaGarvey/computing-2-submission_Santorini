@@ -126,3 +126,37 @@ h1, h2, .header, .status {
     pointer-events: none;            /* clicks fall through to .cell */
     object-fit: contain;             /* Ensures images scale safely */
 }
+
+/* ============================================================
+   Start & Win Screen Modal
+   ============================================================ */
+#modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    background-color: rgba(0, 0, 0, 0.7); /* dark transparency */
+}
+
+.start-modal {
+    background-color: white; /* white background */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* sharp edges by default */
+}
+
+.full-start-image {
+    width: calc(var(--board-size) * 1.2);
+    cursor: pointer;
+    pointer-events: auto; /* Make the image itself clickable */
+    outline: none;
+}
+.full-start-image:focus-visible {
+    outline: 2px solid var(--cursor-color);
+}
