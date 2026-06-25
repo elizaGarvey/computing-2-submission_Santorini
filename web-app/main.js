@@ -17,21 +17,17 @@ const BOARD_SIZE = 5;
 // ============================================================
 // 1. THE SINGLE SOURCE OF TRUTH
 // ============================================================
-const getValidPlacements = (board) => {
-    const valid = [];
-    for (let r = 0; r < BOARD_SIZE; r++) {
-        for (let c = 0; c < BOARD_SIZE; c++) {
-            if (!board[r][c].worker) valid.push({ r, c });
-        }
-    }
-    return valid;
-};
+const getValidPlacements = (board) =>
+    board.flatMap((row, r) =>
+        row.map((cell, c) => (!cell.worker ? { r, c } : null)).filter(Boolean)
+    );
 
 const initialGame = createGame();
 let appState = {
     game: initialGame,
     ui: {
-        highlightedCells: initialGame.turnPhase === "SETUP" ? getValidPlacements(initialGame.board) : [],
+        highlightedCells: initialGame.turnPhase === "SETUP"?
+        getValidPlacements(initialGame.board) : [],
         cursor: { r: 2, c: 2 },
         lastWorkerByPlayer: { P1: null, P2: null },
         showStartScreen: true,
@@ -44,14 +40,11 @@ const boardElement = document.getElementById("game-board");
 const statusElement = document.getElementById("game-status");
 
 // --- Helper Functions ---
-const findWorkerPosition = (board, workerId) => {
-    for (let r = 0; r < BOARD_SIZE; r++) {
-        for (let c = 0; c < BOARD_SIZE; c++) {
-            if (board[r][c].worker === workerId) return { r, c };
-        }
-    }
-    return null;
-};
+const findWorkerPosition = (board, workerId) =>
+    board.flatMap((row, r) =>
+        row.map((cell, c) => (cell.worker === workerId ? { r, c } : null))
+    ).find(Boolean) || null;
+
 
 const getSiblingWorkerId = (workerId) => {
     const [player, letter] = workerId.split("_");
@@ -125,7 +118,8 @@ const reduceState = (state, action) => {
                 if (isClickValid(state.ui.highlightedCells, r, c)) {
                     nextGame = placeWorker(nextGame, r, c);
                     if (nextGame.turnPhase === "SETUP") {
-                        nextUI.highlightedCells = getValidPlacements(nextGame.board);
+                        nextUI.highlightedCells =
+                        getValidPlacements(nextGame.board);
                     } else {
                         nextUI.highlightedCells = [];
                     }
@@ -232,7 +226,8 @@ const render = (state) => {
             modalImage.src = "assets/Start.png";
         } else if (state.game.turnPhase === "GAMEOVER") {
             modalOverlay.style.display = "flex";
-            modalImage.src = state.game.winner === "P1" ? "assets/end_1.png" : "assets/end_2.png";
+            modalImage.src = state.game.winner === "P1" ?
+            "assets/end_1.png" : "assets/end_2.png";
         } else {
             modalOverlay.style.display = "none";
         }
