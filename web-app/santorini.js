@@ -25,8 +25,8 @@ export const createGame = () => {
             }))
         ),
         currentPlayer: "P1",
-        // Phases'PLACE', 'SELECT', 'MOVE', 'BUILD', 'GAMEOVER'
-        turnPhase: "PLACE",
+        // Phases 'SETUP', 'SELECT', 'MOVE', 'BUILD', 'GAMEOVER'
+        turnPhase: "SETUP",
         placedWorkers: 0,
         selectedWorker: null,
         winner: null
@@ -255,7 +255,7 @@ export const placeWorker = (state, r, c) => {
     if (state.board[r][c].worker !== null) return state;
 
     const newBoard = cloneBoard(state.board);
-    const workerMap = ["P1_A", "P1_B", "P2_A", "P2_B"];
+    const workerMap = ["P1_A", "P2_A", "P1_B", "P2_B"];
     newBoard[r][c].worker = workerMap[state.placedWorkers];
     const newPlacedWorkers = state.placedWorkers + 1;
 
@@ -263,9 +263,11 @@ export const placeWorker = (state, r, c) => {
     let nextPlayer = state.currentPlayer;
     let nextPhase = state.turnPhase;
 
-    if (newPlacedWorkers < 2) {
+    if (newPlacedWorkers === 1) {
+        nextPlayer = "P2";
+    } else if (newPlacedWorkers === 2) {
         nextPlayer = "P1";
-    } else if (newPlacedWorkers < 4) {
+    } else if (newPlacedWorkers === 3) {
         nextPlayer = "P2";
     } else if (newPlacedWorkers === 4) {
         nextPhase = "SELECT";

@@ -31,7 +31,7 @@ const initialGame = createGame();
 let appState = {
     game: initialGame,
     ui: {
-        highlightedCells: initialGame.turnPhase === "PLACE" ? getValidPlacements(initialGame.board) : [],
+        highlightedCells: initialGame.turnPhase === "SETUP" ? getValidPlacements(initialGame.board) : [],
         cursor: { r: 2, c: 2 },
         lastWorkerByPlayer: { P1: null, P2: null },
         showStartScreen: true,
@@ -121,10 +121,10 @@ const reduceState = (state, action) => {
                 Phase: ${nextGame.turnPhase}`);
 
             // 2. Process logic based on phase
-            if (nextGame.turnPhase === "PLACE") {
+            if (nextGame.turnPhase === "SETUP") {
                 if (isClickValid(state.ui.highlightedCells, r, c)) {
                     nextGame = placeWorker(nextGame, r, c);
-                    if (nextGame.turnPhase === "PLACE") {
+                    if (nextGame.turnPhase === "SETUP") {
                         nextUI.highlightedCells = getValidPlacements(nextGame.board);
                     } else {
                         nextUI.highlightedCells = [];
