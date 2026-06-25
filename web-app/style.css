@@ -1,181 +1,128 @@
-/* =========================================
-   BAUHAUS SANTORINI - STUDIO DRAFTING EDITION
-   ========================================= */
+/* ============================================================
+   Santorini — board, cells, stacked assets
+   ============================================================ */
 
-/* --- 1. DESIGN TOKENS --- */
 :root {
-    --drafting-paper: #a1a1a1;  /* Warm, off-white paper */
-    --grid-line: #D6D4CB;       /* Soft, technical grey for grid */
-    --concrete-base: #E8E8E8;   /* Light concrete */
-    
-    /* Premium Brass Workers */
-    --p1-copper: #B87333;
-    --p2-brass: #C5A059;
+    /* background_image.png is 5760 x 3072  ->  aspect 1.875.
+       Largest contour-free CENTRED SQUARE = 2444px = 79.6% of image height.
+       'contain' renders the image at height = min(100vh, 100vw / aspect),
+       so board side = flat-frac x that rendered height. Locks at any window
+       size. Range ~0.76 (safe gap) to 0.795 (kisses the contour lines). */
+    --img-aspect: 1.875;
+    --flat-frac:  0.78;
+    --board-size: calc(var(--flat-frac) * min(100vh, 100vw / var(--img-aspect)));
+
+    --bg:        #3f3e43;          /* This single variable now flawlessly locks the body and cells to the same color! */
+    --grid-line: #232225;          /* Changed to a SOLID dark color so the transparent background lines don't show through the gaps */
+    --cursor-color: #2e2e93;       /* Keyboard cursor outline colour — P1's blue, since blue always starts the game */
 }
 
-/* --- 2. BASE LAYOUT --- */
+* { box-sizing: border-box; }
+
 body {
-    background-color: var(--drafting-paper);
-    font-family: 'Courier New', Courier, monospace; 
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
     margin: 0;
-    overflow: hidden; /* Prevents scrollbars */
-    color: #333;
-}
-
-/* --- THE GRAIN OVERLAY --- */
-.grain-overlay {
-    position: fixed; 
-    top: 0; left: 0; width: 100vw; height: 100vh;
-    pointer-events: none; /* Lets clicks pass through to the board */
-    z-index: 9999; 
-    filter: url(#noiseFilter);
-    
-    /* Increased opacity and overlay blend mode so it bites into the concrete */
-    opacity: 0.12; 
-    mix-blend-mode: overlay; 
-}
-
-/* --- 3. HORIZONTAL APP LAYOUT --- */
-.game-container {
-    position: relative; /* Allows absolute positioning for the sidebar */
+    min-height: 100vh;
     display: flex;
-    justify-content: center; /* Perfectly centers the board */
-    align-items: center;
-    width: 100vw;
-    height: 100vh;
-    padding: 0;
-    z-index: 10; /* Keeps it above the grain background */
-}
+    align-items: center;        /* board sits dead-centre = flat-zone centre */
+    justify-content: center;
 
-.game-info {
-    position: absolute; 
-    left: 60px; /* Anchors clearly to the left side */
-    
-    /* MATHEMATICAL ALIGNMENT: 
-       Board is 558px tall (110x5 + 2x4). Half is 279px. 
-       This perfectly aligns text with the top edge of the board! */
-    top: calc(50% - 279px); 
-    
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 15px;
-    z-index: 20;
-}
-
-/* --- 4. TYPOGRAPHY --- */
-h1 { 
-    margin: 0; 
-    font-size: 2.8rem; 
-    letter-spacing: 6px; 
-    text-transform: uppercase;
-    
-    /* Forces invisible text box to hug the letters for pixel-perfect alignment */
-    line-height: 1; 
-}
-
-.status-text { 
-    margin: 0; 
-    font-size: 1rem; 
-    font-weight: bold; 
-    color: #666;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-
-/* --- 5. THE BOARD --- */
-.board {
-    display: grid;
-    grid-template-columns: repeat(5, 110px); 
-    grid-template-rows: repeat(5, 110px);
-    gap: 2px; /* Thin drafting lines */
-    background-color: var(--grid-line); /* Color of the grid lines */
-    border: none;
-    box-shadow: none; 
-}
-
-/* --- 6. THE CELLS (Base Container) --- */
-.cell {
-    width: 110px; 
-    height: 110px;
-    position: relative;
-    cursor: pointer;
-    background-color: transparent; /* Lets the board grid lines work */
-    box-shadow: 4px 4px 0px rgba(0,0,0,0.5); /* Base shadow */
-    transition: transform 0.1s, box-shadow 0.1s; 
-}
-
-.cell:active {
-    transform: translate(3px, 3px); 
-    box-shadow: 1px 1px 0px rgba(0,0,0,0.5); 
-}
-
-/* --- 7. THE BUILDINGS (Rotating Layer) --- */
-/* The graphic sits on a separate layer inside the cell so we can rotate it! */
-.cell::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; width: 100%; height: 100%;
-    
-    background-size: cover;
-    background-position: center;
+    background-color: var(--bg);
+    background-image: url('assets/background_image.png'); /* Now your transparent lines PNG */
+    background-size: contain;    /* whole image, no cropping */
     background-repeat: no-repeat;
-    
-    /* Uses the random rotation injected by Javascript, defaults to 0 */
-    transform: rotate(var(--building-rotation, 0deg));
-    z-index: 1;
+    background-position: center;
+
+    font-family: system-ui, "Segoe UI", sans-serif;
+    color: #e6e6e6;
 }
 
-/* Connect JS data heights to Figma SVGs */
-.cell[data-height="0"]::before { background-image: url('./assets/tile-empty.svg'); }
-.cell[data-height="1"]::before { background-image: url('./assets/tile-level1.svg'); }
-.cell[data-height="2"]::before { background-image: url('./assets/tile-level2.svg'); }
-.cell[data-height="3"]::before { background-image: url('./assets/tile-level3.svg'); }
-.cell[data-height="4"]::before { background-image: url('./assets/tile-dome.svg'); }
+/* HIDE THE TEXT ELEMENTS 
+   We hide these via CSS so they don't push the board off-center,
+   but we keep them in the HTML so app.js doesn't crash!
+*/
+h1, h2, .header, .status {
+    display: none !important;
+}
 
-/* --- 8. THE WORKERS (Premium Brass Rings) --- */
-.cell[data-worker]::after {
-    content: '';
+/* Visually hidden but still announced by screen readers — unlike
+   display:none, which removes an element from the accessibility tree
+   too. This keeps the turn/phase status useful for screen-reader users
+   even though sighted players never see it on screen. */
+.sr-only {
     position: absolute;
-    top: 50%; left: 50%;
-    
-    /* NEW: We subtract a dynamic shift variable from the 50% center point */
-    transform: translate(
-        calc(-50% - var(--worker-shift, 0px)), 
-        calc(-50% - var(--worker-shift, 0px))
-    );
-    
-    width: 32px; 
-    height: 32px;
-    border-radius: 50%;
-    z-index: 10; 
-    
-    box-shadow: inset 2px 2px 4px rgba(0,0,0,0.6), 4px 4px 5px rgba(0,0,0,0.3);
-    
-    /* Adds a smooth animation when the worker climbs up or jumps down a level */
-    transition: transform 0.2s ease-out;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
 }
 
-/* --- 9. WORKER ELEVATION PHYSICS --- */
-/* The taller the building, the further top-left the roof visually shifts. 
-   TUNE THESE NUMBERS: They should inversely match the drop shadows you drew in Figma! 
-   If your Level 1 shadow goes +4px down-right, your worker must shift -4px up-left. */
+/* the 5x5 grid (element id = game-board) */
+#game-board {
+    width: var(--board-size);
+    height: var(--board-size);
 
-.cell[data-height="0"] { --worker-shift: 0px;  } /* Ground Level: Dead center */
-.cell[data-height="1"] { --worker-shift: 4px;  } /* Level 1: Slight shift */
-.cell[data-height="2"] { --worker-shift: 8px;  } /* Level 2: Medium shift */
-.cell[data-height="3"] { --worker-shift: 12px; } /* Level 3: Maximum shift */
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    grid-template-rows:    repeat(5, 1fr);
+    gap: 3px; /* Creates the small trenches between squares */
 
-.cell[data-worker^="P1"]::after { 
-    border: 8px solid var(--p1-copper); 
-    border-color: #D4A373 #A0522D #8B4513 #CD853F;
+    background-color: var(--grid-line); /* The board background becomes the dark trench/wall color */
+    
+    /* Make the outer wall uniform and flat, removing the heavy offset walls */
+    padding: 6px;
+    
+    border: 1px solid rgba(0, 0, 0, 0.8);
+    border-radius: 2px;
+    box-shadow: none; /* Ensure no leftover board shadows exist */
 }
 
-.cell[data-worker^="P2"]::after { 
-    border: 8px solid var(--p2-brass);
-    border-color: #E6C27A #B08D46 #8B6B32 #D4AF37;
+/* each square (class 'cell' added in JS) */
+.cell {
+    position: relative;              /* anchor for the absolute assets */
+    background-color: var(--bg) !important; /* FORCE solid base color */
+    border: none;
+    cursor: pointer;
+    box-shadow: none !important;     /* GLOBALLY KILL ALL INLINE JAVASCRIPT SHADOWS */
+}
+
+/* Keyboard cursor — tinted with whoever's turn it is (set as
+   --cursor-color from main.js, defaulting to P1's blue in :root above).
+   :focus-visible keeps it from appearing on mouse clicks; the plain
+   :focus rule is a fallback for browsers that don't support it. */
+.cell:focus-visible {
+    outline: 3px solid var(--cursor-color);
+    outline-offset: -3px;
+}
+.cell:focus {
+    outline: 3px solid var(--cursor-color);
+    outline-offset: -3px;
+}
+
+/* We combine hover, valid-option, AND catch the old javascript inline styles 
+  so they all look IDENTICAL (flat, solid, slightly lighter gray) 
+*/
+.cell:hover,
+.cell.valid-option,
+.cell[style*="background-color: rgba(255, 255, 255, 0.08)"] {
+    background-color: #49484d !important; 
+}
+
+/* Selected worker is just a hair lighter again */
+.cell.selected-worker,
+.cell[style*="rgba(255, 255, 255, 0.15)"] {
+    background-color: #555459 !important; 
+}
+
+/* stacked block / dome / worker PNGs (class 'asset' added in JS) */
+.asset {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;            /* clicks fall through to .cell */
+    object-fit: contain;             /* Ensures images scale safely */
 }

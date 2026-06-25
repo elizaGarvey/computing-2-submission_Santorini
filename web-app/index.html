@@ -17,9 +17,9 @@
     <div class="game-container">
         <div class="game-info">
             <h1>SANTORINI</h1>
-            <p class="status-text" id="game-status"></p>
+            <p class="status-text sr-only" id="game-status" aria-live="polite"></p>
         </div>
-        <div class="board" id="game-board"></div>
+        <div class="board" id="game-board" role="grid" aria-label="Santorini board, 5 by 5"></div>
     </div>
 
     <script type="module" src="main.js"></script>

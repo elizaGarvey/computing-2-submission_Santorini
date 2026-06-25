@@ -21,9 +21,7 @@ export const createGame = () => {
         board: Array(BOARD_SIZE).fill(null).map(() => 
             Array(BOARD_SIZE).fill(null).map(() => ({
                 height: 0,       
-                worker: null,
-                // Pick a random angle: 0, 90, 180, or 270 (fixed for rest of game)
-                rotation: Math.floor(Math.random() * 4) * 90 
+                worker: null
             }))
         ),
         currentPlayer: 'P1',     
