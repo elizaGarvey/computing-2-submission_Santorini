@@ -1,8 +1,8 @@
-🏛️ Santorini: Stone Ascent
-Santorini is a highly tactical, non-random abstract strategy game for two players. This adaptation takes inspiration from architectural concrete models and brutalist sensibilities.
+Santorini Stylised Stone Ascent:
+Santorini is a highly tactical, non-random abstract strategy game for two players. My adaptation takes inspiration from architectural concrete models and brutalist models.
 
 Navigate the rising tiers of the silent city.
-Shape the ground beneath you to forge a path upward
+Shape the ground beneath you to forge a path upward.
 Reach the third level to claim your place in the light
 
 There are two ways to win the game:
@@ -27,3 +27,5 @@ The primary way to secure victory is to outmaneuver your opponent and step up on
 
 6. Win Condition B: The Blockade
 The secondary (and highly tactical) way to win is to completely box in your opponent using Domes, towering cliffs, and your own workers, leaving them with zero legal moves on their turn.
+
+AI Declaration: core game logic, top-down function architecture, and unit test decisions, structured independently, as well as all visual layouts and assets which were created by hand in Figma. AIs (Gemini and Antigravity) were utilized  as technical co-pilots to streamline code syntax for complex functions, assist with formatting and scaling the single-PNG modal elements within the UI, and generate the precise wrappers needed to implement my self-determined unit testing strategies.
