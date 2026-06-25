@@ -1,4 +1,4 @@
-Santorini Stylised Stone Ascent
+Santorini Stylised Stone Ascent:
 Santorini is a highly tactical, non-random abstract strategy game for two players. My adaptation takes inspiration from architectural concrete models and brutalist models.
 
 Navigate the rising tiers of the silent city.
