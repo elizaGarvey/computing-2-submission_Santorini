@@ -1,6 +1,5 @@
 /**
- * @fileoverview Santorini Game Module API - The "Model"
- * Strictly pure functions. No DOM manipulation. No global state.
+ * @fileoverview Santorini Game Module API
  */
 
 
@@ -15,7 +14,6 @@ const DIRECTIONS = [
 /**
  * Initializes a new Santorini game.
  * Sets up an empty 5x5 board and prepares the game for the worker setup phase.
- * 
  * @returns {Object} The initial state object representing the start of a new
  * game.
  */
@@ -41,7 +39,6 @@ export const createGame = () => {
 
 /**
  * Creates a deep copy of the board array to maintain immutability.
- * 
  * @param {Array<Array<Object>>} board - The 2D board array to clone.
  * @returns {Array<Array<Object>>} A newly cloned 2D board array.
  */
@@ -50,7 +47,6 @@ const cloneBoard = (board) => board.map((row) => row.map((cell) =>
 
 /**
  * Checks if a set of coordinates falls within the 5x5 board.
- * 
  * @param {number} r - The row coordinate.
  * @param {number} c - The column coordinate.
  * @returns {boolean} True if the coordinates are within the board boundaries.
@@ -61,7 +57,6 @@ const isWithinBounds = (r, c) => {
 
 /**
  * Checks if two coordinate spaces are adjacent to each other
- * 
  * @param {number} r1 - The row of the first space.
  * @param {number} c1 - The column of the first space.
  * @param {number} r2 - The row of the second space.
@@ -76,7 +71,6 @@ const isAdjacent = (r1, c1, r2, c2) => {
 
 /**
  * Checks if a targeted space is occupied by a worker or a completed dome.
- * 
  * @param {Object} state - The current game state.
  * @param {number} r - The row coordinate.
  * @param {number} c - The column coordinate.
@@ -84,12 +78,11 @@ const isAdjacent = (r1, c1, r2, c2) => {
  */
 const isOccupied = (state, r, c) => {
     const cell = state.board[r][c];
-    return cell.worker !== null || cell.height === 4; // 4 is a dome
+    return cell.worker !== null || cell.height === 4; //4 is a dome
 };
 
 /**
  * Determines if a worker can legally move from one space to the next.
- * 
  * @param {Object} state - The current game state.
  * @param {number} fromR - The starting row.
  * @param {number} fromC - The starting column.
@@ -110,7 +103,6 @@ const canMove = (state, fromR, fromC, toR, toC) => {
 
 /**
  * Determines if a worker can legally build on a targeted space.
- * 
  * @param {Object} state - The current game state.
  * @param {number} workerR - The row of the worker.
  * @param {number} workerC - The column of the worker.
@@ -133,8 +125,7 @@ const canBuild = (state, workerR, workerC, targetR, targetC) => {
  * Enforces Santorini movement rules: workers can step up a maximum of one
  * level, but can drop down any number of levels. Workers cannot move into
  * spaces occupied by other workers or completed domes.
- * 
- * @param {Object} state - The current state of the game board and turn progression.
+ * @param {Object} state - The state of the game board, turn progression.
  * @param {number} r - The row coordinate of the worker attempting to move.
  * @param {number} c - The column coordinate of the worker attempting to move.
  * @returns {Array<{r: number, c: number}>} An array of coordinate objects
@@ -143,12 +134,12 @@ const canBuild = (state, workerR, workerC, targetR, targetC) => {
 
 export const getValidMoves = (state, r, c) => {
     return DIRECTIONS
-        //translates generic directions into actual board coordinates based on
+        //translates directions into actual board coordinates based on
         // where the worker currently is
         .map(([dR, dC]) => ({ r: r + dR, c: c + dC }))
 
-        //takes those new coordinates and throws away any that are out of
-        //bounds, too high to climb, or occupied
+        //takes new coordinates and throws away any that are out of
+        //bounds (too high to climb, or occupied)
         .filter(({ r: targetR, c: targetC }) =>
             canMove(state, r, c, targetR, targetC));
 };
@@ -159,8 +150,7 @@ export const getValidMoves = (state, r, c) => {
  * or dome.
  * Enforces the rule that buildings cannot be constructed on spaces occupied
  * by workers or on top of completed domes.
- * 
- * @param {Object} state - The current state of the game board and turn progression.
+ * @param {Object} state - The state of the game board and turn progression.
  * @param {number} r - The row coordinate of the worker attempting to build.
  * @param {number} c - The column coordinate of the worker attempting to build.
  * @returns {Array<{r: number, c: number}>} An array of coordinate objects
@@ -175,14 +165,13 @@ export const getValidBuilds = (state, r, c) => {
 };
 
 
-//ACTIONS - Triggered by user clicks, return a deep-cloned, brand new state.
+//ACTIONS - Triggered by user clicks, return a brand new state
 
 
 /**
  * Marks a specific worker as the active worker for the current turn,
  * transitioning the game phase from worker selection to movement.
- * 
- * @param {Object} state - The current state of the game board and turn progression.
+ * @param {Object} state - The state of the game board and turn progression.
  * @param {number} r - The row coordinate of the chosen worker.
  * @param {number} c - The column coordinate of the chosen worker.
  * @returns {Object} A new game state with the worker selected and the phase
@@ -190,7 +179,6 @@ export const getValidBuilds = (state, r, c) => {
  */
 
 export const selectWorker = (state, r, c) => {
-    // Pure functional state update using the spread operator
     return {
         ...state,
         turnPhase: "MOVE",
@@ -202,8 +190,7 @@ export const selectWorker = (state, r, c) => {
  * Relocates the active worker to a new space on the board.
  * If the worker steps up onto a Level 3 building, the current player
  * immediately wins. Otherwise, the turn transitions to the building phase.
- * 
- * @param {Object} state - The current state of the game board and turn progression.
+ * @param {Object} state  The state of the game board and turn progression.
  * @param {number} fromR - The starting row coordinate of the worker.
  * @param {number} fromC - The starting column coordinate of the worker.
  * @param {number} toR - The destination row coordinate for the worker.
@@ -213,14 +200,14 @@ export const selectWorker = (state, r, c) => {
  */
 
 export const moveWorker = (state, fromR, fromC, toR, toC) => {
-    // 1. Create a pure, functional copy of the board array
+    // Create a pure copy of the board array
     const newBoard = cloneBoard(state.board);
-    // 2. Relocate the worker on the copied board
+    // Relocate the worker on the copied board
     const workerId = newBoard[fromR][fromC].worker;
     newBoard[fromR][fromC].worker = null;
     newBoard[toR][toC].worker = workerId;
 
-    // 3. Check Win Condition
+    // Check Win Conditions
     if (newBoard[toR][toC].height === 3) {
         return {
             ...state,
@@ -230,7 +217,7 @@ export const moveWorker = (state, fromR, fromC, toR, toC) => {
         };
     }
 
-    // 4. Return pure updated state, moving to BUILD phase
+    // Return updated state, moving to BUILD phase
     return {
         ...state,
         board: newBoard,
@@ -240,9 +227,8 @@ export const moveWorker = (state, fromR, fromC, toR, toC) => {
 };
 
 /**
- * Scans the board to determine if a specific player has any possible legal moves.
+ * Scans the board to determine if a specific player has any legal moves.
  * Used to check for blockade win conditions.
- * 
  * @param {Object} state - The current game state.
  * @param {string} player - The player ID (e.g. "P1" or "P2").
  * @returns {boolean} True if the player has at least one valid move.
@@ -250,7 +236,7 @@ export const moveWorker = (state, fromR, fromC, toR, toC) => {
 
 const hasValidMoves = (state, player) => {
     return state.board.some((row, r) =>
-        row.some((cell, c) =>     // least 1 valid move
+        row.some((cell, c) =>   // at least 1 valid move
             cell.worker &&
             cell.worker.startsWith(player) &&
             getValidMoves(state, r, c).length > 0
@@ -264,8 +250,7 @@ const hasValidMoves = (state, player) => {
  * Ends the current player's turn and passes the turn to the opponent.
  * Also checks if the opponent is trapped with zero legal moves, triggering
  * a blockade win condition.
- * 
- * @param {Object} state - The current state of the game board and turn progression.
+ * @param {Object} state - The state of the game board and turn progression.
  * @param {number} r - The row coordinate where the block will be built.
  * @param {number} c - The column coordinate where the block will be built.
  * @returns {Object} A new game state reflecting the new building height and
@@ -307,8 +292,7 @@ export const buildBlock = (state, r, c) => {
  * Places a new worker onto the board during the initial setup phase.
  * Players alternate placing workers. Once all four workers are placed, the game
  * transitions into Player 1's first official turn.
- * 
- * @param {Object} state - The current state of the game board and turn progression.
+ * @param {Object} state - The state of the game board and turn progression.
  * @param {number} r - The target row coordinate for the new worker.
  * @param {number} c - The target column coordinate for the new worker.
  * @returns {Object} A new game state tracking the newly placed worker and
@@ -316,7 +300,7 @@ export const buildBlock = (state, r, c) => {
  */
 
 export const placeWorker = (state, r, c) => {
-    // Pure guard clause: if occupied, return the state untouched
+    //if occupied, return the state untouched
     if (state.board[r][c].worker !== null) return state;
 
     const newBoard = cloneBoard(state.board);
@@ -336,7 +320,7 @@ export const placeWorker = (state, r, c) => {
         nextPlayer = "P2";
     } else if (newPlacedWorkers === 4) {
         nextPhase = "SELECT";
-        nextPlayer = "P1"; // Player 1 always makes the first actual move
+        nextPlayer = "P1"; // Player 1 always makes the first move
     }
 
     return {

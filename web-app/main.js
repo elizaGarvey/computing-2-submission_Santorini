@@ -1,6 +1,5 @@
 /**
- * @fileoverview Web App Controller - The "View & Controller"
- * Unidirectional Data Flow: Action -> Dispatcher -> Reducer -> Render
+ * @fileoverview Web App Controller - Handles UI and DOM updates
  */
 import {
     createGame,
@@ -15,7 +14,7 @@ import {
 const BOARD_SIZE = 5;
 
 // ============================================================
-// 1. THE SINGLE SOURCE OF TRUTH
+// STATE INITIALIZATION
 // ============================================================
 const getValidPlacements = (board) =>
     board.flatMap((row, r) =>
@@ -57,7 +56,7 @@ const isClickValid = (highlightedCells, r, c) => {
 
 
 // ============================================================
-// 2. THE PURE REDUCER (State + Action = New State)
+// STATE REDUCER
 // ============================================================
 const reduceState = (state, action) => {
     switch (action.type) {
@@ -205,7 +204,7 @@ const reduceState = (state, action) => {
 
 
 // ============================================================
-// 3. THE DISPATCHER
+// EVENT DISPATCHER
 // ============================================================
 const dispatch = (action) => {
     appState = reduceState(appState, action);
@@ -214,7 +213,7 @@ const dispatch = (action) => {
 
 
 // ============================================================
-// 4. THE PURE RENDERE
+// DOM RENDERING
 // ============================================================
 const render = (state) => {
     const modalOverlay = document.getElementById("modal-overlay");
@@ -296,7 +295,7 @@ const render = (state) => {
             (r === state.ui.cursor.r && c === state.ui.cursor.c);
             cellDiv.tabIndex = isCursor ? 0 : -1;
 
-            // ACTION: Dispatch instead of direct logic
+            // Dispatch instead of direct logic
             cellDiv.addEventListener("click", () => dispatch
             ({ type: "INTERACT_CELL", r, c }));
 
@@ -324,7 +323,7 @@ const buildCellLabel = (r, c, cell, isValidTarget) => {
 
 
 // ============================================================
-// 5. EVENT LISTENERS (Dumb Inputs)
+// EVENT LISTENERS
 // ============================================================
 boardElement.addEventListener("keydown", (e) => {
     switch (e.key) {
