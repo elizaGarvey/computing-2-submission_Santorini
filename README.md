@@ -1,3 +1,5 @@
+CID: 02618768
+
 Santorini Stylised Stone Ascent:
 Santorini is a highly tactical, non-random abstract strategy game for two players. My adaptation takes inspiration from architectural concrete models and brutalist models.
 
