@@ -104,7 +104,7 @@
 
 
 <div class="description">
-    Constructs a new building block or dome on the targeted space.Ends the current player's turn, passes turn to opponent, and  checksthe new opponent is trapped with zero legal moves to trigger a win condition.* @param {Object} state - current state of the game board and turns.
+    Constructs a new building block or dome on the targeted space.Ends the current player's turn and passes the turn to the opponent.Also checks if the opponent is trapped with zero legal moves, triggeringa blockade win condition.
 </div>
 
 
@@ -142,7 +142,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="santorini.js.html">santorini.js</a>, <a href="santorini.js.html#line212">line 212</a>
+        <a href="santorini.js.html">santorini.js</a>, <a href="santorini.js.html#line275">line 275</a>
     </li></ul></dd>
     
 
@@ -166,7 +166,7 @@
 
 
 <div class="description">
-    new game, setting up empty 5x5, beginning  worker placement phase* @returns {Object}  initial state object representing the start of  new game
+    Initializes a new Santorini game.Sets up an empty 5x5 board and prepares the game for the worker setup phase.
 </div>
 
 
@@ -204,7 +204,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="santorini.js.html">santorini.js</a>, <a href="santorini.js.html#line19">line 19</a>
+        <a href="santorini.js.html">santorini.js</a>, <a href="santorini.js.html#line22">line 22</a>
     </li></ul></dd>
     
 
@@ -228,7 +228,7 @@
 
 
 <div class="description">
-    Calculates all adjacent spaces where a worker can build another level.Enforces the rule that buildings cannot be placed on occupied spaces oron top of completed domes.* @param {Object} state -  current state of the game board and turns.
+    Calculates all adjacent spaces where a worker can construct a building blockor dome.Enforces the rule that buildings cannot be constructed on spaces occupiedby workers or on top of completed domes.
 </div>
 
 
@@ -266,7 +266,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="santorini.js.html">santorini.js</a>, <a href="santorini.js.html#line113">line 113</a>
+        <a href="santorini.js.html">santorini.js</a>, <a href="santorini.js.html#line170">line 170</a>
     </li></ul></dd>
     
 
@@ -290,7 +290,7 @@
 
 
 <div class="description">
-    identifies all allowed adjacent spaces the selected worker can step into.Enforces Santorini movement rule, workers can move up  one levelbut can move down any number of levels.cannot move into spaces with other workers or buildings capped by dome.* @param {Object} state -  current state of the game board and player turns.
+    Identifies all valid adjacent spaces a worker can move into.Enforces Santorini movement rules: workers can step up a maximum of onelevel, but can drop down any number of levels. Workers cannot move intospaces occupied by other workers or completed domes.
 </div>
 
 
@@ -328,7 +328,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="santorini.js.html">santorini.js</a>, <a href="santorini.js.html#line89">line 89</a>
+        <a href="santorini.js.html">santorini.js</a>, <a href="santorini.js.html#line144">line 144</a>
     </li></ul></dd>
     
 
@@ -352,7 +352,7 @@
 
 
 <div class="description">
-    Relocates  active worker to a new space on the board.If the worker steps up onto a Level 3 building, declare the currentplayer the winner.Else transition the turn to building phase.* @param {Object} state - current state of the game board and turns.
+    Relocates the active worker to a new space on the board.If the worker steps up onto a Level 3 building, the current playerimmediately wins. Otherwise, the turn transitions to the building phase.
 </div>
 
 
@@ -390,7 +390,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="santorini.js.html">santorini.js</a>, <a href="santorini.js.html#line156">line 156</a>
+        <a href="santorini.js.html">santorini.js</a>, <a href="santorini.js.html#line215">line 215</a>
     </li></ul></dd>
     
 
@@ -414,7 +414,7 @@
 
 
 <div class="description">
-    Drops new worker onto the board during the initial setup phase.Once both players have placed their two workers,  transition gameinto Player 1's first turn.* @param {Object} state -  current state of the game board and turns.
+    Places a new worker onto the board during the initial setup phase.Players alternate placing workers. Once all four workers are placed, the gametransitions into Player 1's first official turn.
 </div>
 
 
@@ -452,7 +452,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="santorini.js.html">santorini.js</a>, <a href="santorini.js.html#line253">line 253</a>
+        <a href="santorini.js.html">santorini.js</a>, <a href="santorini.js.html#line318">line 318</a>
     </li></ul></dd>
     
 
@@ -476,7 +476,7 @@
 
 
 <div class="description">
-    Mark a specific worker as the active item for the current turn,transitioning the player from selection phase into movement phase.* @param {Object} state -  current state of the game board and turns.
+    Marks a specific worker as the active worker for the current turn,transitioning the game phase from worker selection to movement.
 </div>
 
 
@@ -514,7 +514,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="santorini.js.html">santorini.js</a>, <a href="santorini.js.html#line134">line 134</a>
+        <a href="santorini.js.html">santorini.js</a>, <a href="santorini.js.html#line192">line 192</a>
     </li></ul></dd>
     
 
@@ -542,7 +542,7 @@
     
 
     
-    <h4 class="name" id="hasValidMoves"><span class="type-signature"></span>hasValidMoves<span class="signature">(state, player)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="canBuild"><span class="type-signature"></span>canBuild<span class="signature">(state, workerR, workerC, targetR, targetC)</span><span class="type-signature"> &rarr; {boolean}</span></h4>
     
 
     
@@ -550,7 +550,7 @@
 
 
 <div class="description">
-    scans board to determine if a specific player has any possible moves.
+    Determines if a worker can legally build on a targeted space.
 </div>
 
 
@@ -592,7 +592,7 @@
             <td class="type">
             
                 
-<span class="param-type">*</span>
+<span class="param-type">Object</span>
 
 
             
@@ -602,20 +602,20 @@
 
             
 
-            <td class="description last">board state</td>
+            <td class="description last">The current game state.</td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>player</code></td>
+                <td class="name"><code>workerR</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">*</span>
+<span class="param-type">number</span>
 
 
             
@@ -625,7 +625,76 @@
 
             
 
-            <td class="description last">player ID</td>
+            <td class="description last">The row of the worker.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>workerC</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The column of the worker.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>targetR</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The target row for the build.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>targetC</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The target column for the build.</td>
         </tr>
 
     
@@ -666,7 +735,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="santorini.js.html">santorini.js</a>, <a href="santorini.js.html#line190">line 190</a>
+        <a href="santorini.js.html">santorini.js</a>, <a href="santorini.js.html#line121">line 121</a>
     </li></ul></dd>
     
 
@@ -695,10 +764,1229 @@
 
         
 <div class="param-desc">
-    true if moves exist
+    True if the build is legal.
 </div>
 
 
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">boolean</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="canMove"><span class="type-signature"></span>canMove<span class="signature">(state, fromR, fromC, toR, toC)</span><span class="type-signature"> &rarr; {boolean}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Determines if a worker can legally move from one space to the next.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>state</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The current game state.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>fromR</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The starting row.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>fromC</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The starting column.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>toR</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The destination row.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>toC</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The destination column.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="santorini.js.html">santorini.js</a>, <a href="santorini.js.html#line100">line 100</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    True if the move is legal according to Santorini rules.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">boolean</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="cloneBoard"><span class="type-signature"></span>cloneBoard<span class="signature">(board)</span><span class="type-signature"> &rarr; {Array.&lt;Array.&lt;Object>>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Creates a deep copy of the board array to maintain immutability.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>board</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array.&lt;Array.&lt;Object>></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The 2D board array to clone.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="santorini.js.html">santorini.js</a>, <a href="santorini.js.html#line48">line 48</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    A newly cloned 2D board array.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Array.&lt;Array.&lt;Object>></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="hasValidMoves"><span class="type-signature"></span>hasValidMoves<span class="signature">(state, player)</span><span class="type-signature"> &rarr; {boolean}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Scans the board to determine if a specific player has any possible legal moves.Used to check for blockade win conditions.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>state</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The current game state.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>player</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The player ID (e.g. "P1" or "P2").</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="santorini.js.html">santorini.js</a>, <a href="santorini.js.html#line251">line 251</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    True if the player has at least one valid move.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">boolean</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="isAdjacent"><span class="type-signature"></span>isAdjacent<span class="signature">(r1, c1, r2, c2)</span><span class="type-signature"> &rarr; {boolean}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Checks if two coordinate spaces are adjacent to each other
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>r1</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The row of the first space.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>c1</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The column of the first space.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>r2</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The row of the second space.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>c2</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The column of the second space.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="santorini.js.html">santorini.js</a>, <a href="santorini.js.html#line71">line 71</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    True if the spaces are adjacent.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">boolean</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="isOccupied"><span class="type-signature"></span>isOccupied<span class="signature">(state, r, c)</span><span class="type-signature"> &rarr; {boolean}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Checks if a targeted space is occupied by a worker or a completed dome.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>state</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The current game state.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>r</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The row coordinate.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>c</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The column coordinate.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="santorini.js.html">santorini.js</a>, <a href="santorini.js.html#line85">line 85</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    True if the space is occupied.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">boolean</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="isWithinBounds"><span class="type-signature"></span>isWithinBounds<span class="signature">(r, c)</span><span class="type-signature"> &rarr; {boolean}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Checks if a set of coordinates falls within the 5x5 board.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>r</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The row coordinate.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>c</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The column coordinate.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="santorini.js.html">santorini.js</a>, <a href="santorini.js.html#line58">line 58</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    True if the coordinates are within the board boundaries.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">boolean</span>
+
+
+    </dd>
+</dl>
 
     
 
@@ -722,13 +2010,13 @@
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#buildBlock">buildBlock</a></li><li><a href="global.html#createGame">createGame</a></li><li><a href="global.html#getValidBuilds">getValidBuilds</a></li><li><a href="global.html#getValidMoves">getValidMoves</a></li><li><a href="global.html#hasValidMoves">hasValidMoves</a></li><li><a href="global.html#moveWorker">moveWorker</a></li><li><a href="global.html#placeWorker">placeWorker</a></li><li><a href="global.html#selectWorker">selectWorker</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#buildBlock">buildBlock</a></li><li><a href="global.html#canBuild">canBuild</a></li><li><a href="global.html#canMove">canMove</a></li><li><a href="global.html#cloneBoard">cloneBoard</a></li><li><a href="global.html#createGame">createGame</a></li><li><a href="global.html#getValidBuilds">getValidBuilds</a></li><li><a href="global.html#getValidMoves">getValidMoves</a></li><li><a href="global.html#hasValidMoves">hasValidMoves</a></li><li><a href="global.html#isAdjacent">isAdjacent</a></li><li><a href="global.html#isOccupied">isOccupied</a></li><li><a href="global.html#isWithinBounds">isWithinBounds</a></li><li><a href="global.html#moveWorker">moveWorker</a></li><li><a href="global.html#placeWorker">placeWorker</a></li><li><a href="global.html#selectWorker">selectWorker</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.5</a> on Thu Jun 25 2026 07:33:53 GMT+0100 (British Summer Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.5</a> on Thu Jun 25 2026 09:56:58 GMT+0100 (British Summer Time)
 </footer>
 
 <script> prettyPrint(); </script>
