@@ -1,18 +1,18 @@
-🏛️ The Game: General Rules
-Santorini is a highly tactical, non-random abstract strategy game for two players.
+🏛️ Santorini: Stone Ascent
+Santorini is a highly tactical, non-random abstract strategy game for two players. This adaptation takes inspiration from architectural concrete models and brutalist sensibilities.
 
-Objective
+Navigate the rising tiers of the silent city.
+Shape the ground beneath you to forge a path upward
+Reach the third level to claim your place in the light
+
 There are two ways to win the game:
-
 Ascension: Move one of your workers onto the top of a Level 3 building.
-
 Blockade: Trap your opponent so they are unable to make a legal move or build on their turn.
 
-📸 Visual Guide to Mechanics
+
+📸 Visual Guide
 1. The Setup Phase
 During the setup phase, players take turns placing their workers onto unoccupied spaces on the ground level (Level 0) of the 5x5 grid.
-
-> Initial Setup: Players taking turns placing workers on Level 0 before the main game loop begins.
 
 2. Turn Structure: Movement & Elevation
 On a player's turn, they must select one of their workers and perform a mandatory Move. A worker may move into one of the 8 adjacent spaces, but they can only climb a maximum of 1 level higher than their current space (though they can step down safely from any height).
@@ -36,5 +36,3 @@ The primary way to secure victory is to outmaneuver your opponent and step up on
 
 6. Win Condition B: The Blockade
 The secondary (and highly tactical) way to win is to completely box in your opponent using Domes, towering cliffs, and your own workers, leaving them with zero legal moves on their turn.
-
-> Tactical Blockade: Winning the game by leaving the opponent with zero legal moves.
